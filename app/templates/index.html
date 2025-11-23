@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>🩺 AI Medical Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 300% 300%;
+            animation: gradientShift 15s ease infinite;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(1deg); }
+            66% { transform: translate(-20px, 20px) rotate(-1deg); }
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            animation: containerFadeIn 1.5s ease-out;
+        }
+        
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            border-bottom: none;
+            padding: 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 60px;
+            animation: headerSlideDown 1s ease-out;
+        }
+        
+        @keyframes headerSlideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: headerContentSlide 1.2s ease-out;
+        }
+        
+        @keyframes headerContentSlide {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            animation: iconPulse 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .header-icon:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 12px 35px rgba(255, 255, 255, 0.6);
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.95);
+            margin-top: 3px;
+            font-weight: 400;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .clear-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            animation: buttonGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes buttonGlow {
+            from {
+                box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+            }
+            to {
+                box-shadow: 0 8px 30px rgba(255, 255, 255, 0.5);
+            }
+        }
+        
+        .clear-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.6);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 3rem 2rem;
+            background: transparent;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            /* Hide scrollbar for all browsers */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .chat-messages::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .message-group {
+            margin-bottom: 2rem;
+            max-width: 768px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .message { 
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .user {
+            flex-direction: row-reverse; /* User avatar on right */
+        }
+        
+        .assistant {
+            flex-direction: row; /* Assistant avatar on left (same as before) */
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border: 3px solid white;
+            animation: avatarBounce 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes avatarBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .message-avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            animation-delay: 0.2s;
+        }
+        
+        .assistant .message-avatar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            animation-delay: 0.4s;
+        }
+        
+        .message-content {
+            flex: 1;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            color: #2d333a;
+        }
+        
+        .user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem 2rem;
+            border-radius: 25px;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            animation: messageSlideInRight 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .user .message-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        @keyframes messageSlideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @keyframes messageSlideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        .assistant .message-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+            padding: 1.5rem 2rem;
+            border-radius: 25px;
+            border-bottom-left-radius: 8px;
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.15);
+            border: 2px solid rgba(240, 147, 251, 0.2);
+            backdrop-filter: blur(15px);
+            animation: messageSlideInRight 0.8s ease-out;
+            position: relative;
+        }
+        
+        @keyframes messageSlideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        .assistant .message-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .assistant .message-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .input-section {
+            padding: 1.25rem 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .input-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 30px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+            max-width: 768px;
+            margin: 0 auto;
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+        
+        .input-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .input-wrapper:focus-within::before {
+            opacity: 1;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25), 0 0 0 6px rgba(102, 126, 234, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: #00897b;
+            box-shadow: 0 8px 30px rgba(0, 137, 123, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        textarea { 
+            width: 100%;
+            min-height: 48px;
+            max-height: 200px;
+            padding: 14px 60px 14px 20px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            line-height: 1.4;
+            resize: none;
+            font-family: inherit;
+            background: transparent;
+            outline: none;
+            color: #2d333a;
+            transition: all 0.3s ease;
+        }
+        
+        textarea:focus {
+            transform: scale(1.01);
+        }
+        
+        textarea::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+        
+        textarea:focus::placeholder {
+            color: #667eea;
+        }
+        
+        .send-button {
+            position: absolute;
+            right: 6px;
+            bottom: 6px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            animation: buttonPulse 2s ease-in-out infinite;
+            z-index: 10;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% { 
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3), 0 0 0 0 rgba(102, 126, 234, 0.4);
+            }
+            50% { 
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3), 0 0 0 8px rgba(102, 126, 234, 0);
+            }
+        }
+        
+        .send-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+            animation: none;
+        }
+        
+        .send-button:disabled {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            cursor: not-allowed;
+            box-shadow: 0 4px 15px rgba(156, 163, 175, 0.2);
+            color: #9ca3af;
+            animation: none;
+        }
+        
+        .empty-chat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 148%;
+            text-align: center;
+            color: #6e7781;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .empty-chat-icon {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.3));
+            animation: iconFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(2deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(-5px) rotate(-2deg); }
+        }
+        
+        .empty-chat h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from {
+                filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.6));
+            }
+        }
+        
+        .empty-chat p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            color: #4a5568;
+            font-weight: 400;
+        }
+        
+        .example-prompts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        
+        .example-prompt {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-align: left;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+        
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .example-prompt:nth-child(2) { animation-delay: 0.5s; }
+        .example-prompt:nth-child(3) { animation-delay: 1s; }
+        .example-prompt:nth-child(4) { animation-delay: 1.5s; }
+        
+        .example-prompt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .example-prompt:hover::before {
+            left: 100%;
+        }
+        
+        .example-prompt:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
+        }
+        
+        .example-prompt h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #00695c;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .example-prompt h4 i {
+            color: #00897b;
+        }
+        
+        .example-prompt p {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .error { 
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border: 2px solid #ef5350;
+            color: #c62828;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            max-width: 768px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 15px rgba(239, 83, 80, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 0;
+                border-radius: 0;
+                height: 100vh;
+                width: 100vw;
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+            
+            .header {
+                padding: 0.75rem 1rem;
+                min-height: 60px;
+            }
+            
+            .header-left {
+                gap: 0.6rem;
+            }
+            
+            .header-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+                border-radius: 10px;
+            }
+            
+            .header-title {
+                font-size: 1rem;
+            }
+            
+            .header-subtitle {
+                font-size: 0.75rem;
+            }
+            
+            .clear-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+                gap: 0.3rem;
+            }
+            
+            .chat-messages {
+                padding: 1rem;
+            }
+            
+            .message-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .message-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+            
+            .message-content {
+                font-size: 0.9rem;
+            }
+            
+            .user .message-content,
+            .assistant .message-content {
+                padding: 1rem 1.25rem;
+            }
+            
+            .input-section {
+                padding: 1rem 1.25rem;
+            }
+            
+            .input-wrapper {
+                border-radius: 16px;
+            }
+            
+            textarea {
+                padding: 14px 50px 14px 16px;
+                font-size: 0.95rem;
+            }
+            
+            .send-button {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .example-prompts {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .empty-chat-icon {
+                font-size: 3.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .empty-chat h2 {
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .empty-chat p {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .example-prompt {
+                padding: 1.25rem;
+            }
+            
+            .example-prompt h4 {
+                font-size: 0.95rem;
+            }
+            
+            .example-prompt p {
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.6rem 0.75rem;
+                min-height: 55px;
+            }
+            
+            .header-right {
+                gap: 0.5rem;
+            }
+            
+            .clear-btn {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+            
+            .clear-btn i {
+                margin-right: 0;
+            }
+            
+            .clear-btn span {
+                display: none;
+            }
+            
+            .chat-messages {
+                padding: 0.75rem;
+            }
+            
+            .message {
+                gap: 0.75rem;
+            }
+            
+            .message-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+            
+            .user .message-content,
+            .assistant .message-content {
+                padding: 0.875rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .input-section {
+                padding: 1rem;
+            }
+            
+            textarea {
+                padding: 12px 45px 12px 14px;
+                font-size: 0.9rem;
+                min-height: 48px;
+            }
+            
+            .send-button {
+                width: 32px;
+                height: 32px;
+                right: 6px;
+                bottom: 6px;
+                font-size: 0.875rem;
+            }
+            
+            .empty-chat {
+                padding: 1rem;
+            }
+            
+            .empty-chat-icon {
+                font-size: 3rem;
+            }
+            
+            .empty-chat h2 {
+                font-size: 1.2rem;
+            }
+            
+            .empty-chat p {
+                font-size: 0.9rem;
+            }
+            
+            .example-prompt {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .header-title {
+                font-size: 1rem;
+            }
+            
+            .header-subtitle {
+                display: none;
+            }
+            
+            .message-content {
+                font-size: 0.85rem;
+            }
+            
+            textarea {
+                font-size: 0.875rem;
+            }
+        }
+        
+        /* Remove the custom scrollbar styles and direction changes */
+        
+        /* Pulse animation for send button */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(0, 137, 123, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(0, 137, 123, 0.5);
+            }
+            100% {
+                box-shadow: 0 4px 15px rgba(0, 137, 123, 0.3);
+            }
+        }
+        
+        .send-button:not(:disabled):active {
+            animation: pulse 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <header class="header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <div>
+                    <div class="header-title">AI Medical Assistant</div>
+                    <div class="header-subtitle">Your intelligent healthcare companion</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="{{ url_for('clear') }}" class="clear-btn">
+                    <i class="fas fa-broom"></i> <span>New Chat</span>
+                </a>
+            </div>
+        </header>
+
+        {% if error %}
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="chat-messages">
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="message-group">
+                        <div class="message {{ msg.role }}">
+                            <div class="message-avatar">
+                                {% if msg.role == 'user' %}
+                                    <i class="fas fa-user"></i>
+                                {% else %}
+                                    <i class="fas fa-robot"></i>
+                                {% endif %}
+                            </div>
+                            <div class="message-content">
+                                {% if msg.role == 'assistant' %}
+                                    {{ msg.content | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+                                {% else %}
+                                    {{ msg.content }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-chat">
+                    <div class="empty-chat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h2>Welcome to AI Medical Assistant</h2>
+                    <p>I'm here to help answer your medical questions with accurate, reliable information. Ask me anything about health, symptoms, treatments, or general medical knowledge.</p>
+                    
+                    <div class="example-prompts">
+                        <div class="example-prompt" onclick="fillPrompt('What are the early symptoms of diabetes and how can it be prevented?')">
+                            <h4><i class="fas fa-heartbeat"></i> Diabetes & Prevention</h4>
+                            <p>Learn about early diabetes symptoms and effective prevention strategies</p>
+                        </div>
+                        <div class="example-prompt" onclick="fillPrompt('How can I naturally lower my blood pressure without medication?')">
+                            <h4><i class="fas fa-leaf"></i> Natural Treatments</h4>
+                            <p>Discover natural methods to manage blood pressure effectively</p>
+                        </div>
+                        <div class="example-prompt" onclick="fillPrompt('What are the different types of hypertension medications and their side effects?')">
+                            <h4><i class="fas fa-pills"></i> Medications Guide</h4>
+                            <p>Comprehensive guide to hypertension medications and their effects</p>
+                        </div>
+                        <div class="example-prompt" onclick="fillPrompt('Explain the difference between Type 1 and Type 2 diabetes in detail')">
+                            <h4><i class="fas fa-microscope"></i> Medical Education</h4>
+                            <p>Detailed comparison of diabetes types and their characteristics</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="input-section">
+            <form method="post" action="{{ url_for('index') }}" class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        name="prompt" 
+                        id="messageInput"
+                        placeholder="Ask a medical question..." 
+                        required
+                        rows="1"
+                    ></textarea>
+                    <button type="submit" class="send-button" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-resize textarea
+        const textarea = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+            
+            // Enable/disable send button based on content
+            sendButton.disabled = !this.value.trim();
+        });
+        
+        // Auto-scroll to bottom of chat
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Auto-focus on textarea
+        textarea.focus();
+        
+        // Handle Enter key (Shift+Enter for new line, Enter to send)
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (this.value.trim()) {
+                    this.closest('form').submit();
+                }
+            }
+        });
+        
+        // Fill prompt function for example prompts
+        function fillPrompt(text) {
+            textarea.value = text;
+            textarea.focus();
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+            sendButton.disabled = false;
+        }
+        
+        // Initial state
+        sendButton.disabled = !textarea.value.trim();
+        
+        // Format markdown in assistant messages
+        function formatMarkdown() {
+            const assistantMessages = document.querySelectorAll('.assistant .message-content');
+            assistantMessages.forEach(function(element) {
+                let content = element.innerHTML;
+                // Convert **text** to <strong>text</strong>
+                content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                element.innerHTML = content;
+            });
+        }
+        
+        // Apply markdown formatting on page load
+        formatMarkdown();
+        
+        // Smooth scroll for new messages
+        if (window.location.hash === '#new-message') {
+            setTimeout(() => {
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+    </script>
+</body>
+</html>
