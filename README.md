@@ -57,14 +57,15 @@ The **RAG AI Medical Assistant Chatbot** is a sophisticated healthcare companion
 
 ## 🎬 Demo
 
-### Welcome Screen
-![Welcome Screen](screenshots/welcome.png)
+### Welcome Screen - Empty Chat Interface
+The chatbot features a beautiful gradient background with an intuitive welcome screen and example prompts to get started.
 
-### Chat Interface
-![Chat Interface](screenshots/chat.png)
+![Welcome Screen](screenshots/Screenshot%202025-11-23%20154129.png)
 
-### Mobile Responsive
-![Mobile View](screenshots/mobile.png)
+### Active Chat Interface
+Real-time medical question answering with properly formatted responses, including bold headings and structured medical information.
+
+![Chat Interface](screenshots/Screenshot%202025-11-23%20154324.png)
 
 ---
 
