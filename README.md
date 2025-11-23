@@ -126,7 +126,7 @@ The **RAG AI Medical Assistant Chatbot** is a sophisticated healthcare companion
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/RAG-AI-Medical-Assistant-Chatbot.git
+git clone https://github.com/SajjadKhanYousafzai/RAG-AI-Medical-Assistant-Chatbot.git
 cd RAG-AI-Medical-Assistant-Chatbot
 ```
 
@@ -359,11 +359,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-**Project Maintainer**: Your Name
+**Project Maintainer**: Sajjad Ali Shah
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+- GitHub: [@SajjadKhanYousafzai](https://github.com/SajjadKhanYousafzai)
+- Repository: [RAG-AI-Medical-Assistant-Chatbot](https://github.com/SajjadKhanYousafzai/RAG-AI-Medical-Assistant-Chatbot)
 
 ---
 
