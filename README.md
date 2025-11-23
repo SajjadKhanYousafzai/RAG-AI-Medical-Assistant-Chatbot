@@ -60,7 +60,9 @@ The **RAG AI Medical Assistant Chatbot** is a sophisticated healthcare companion
 ### 🎥 Video Demonstration
 Watch the RAG AI Medical Assistant Chatbot in action - showcasing the interactive UI, real-time medical Q&A, and smooth user experience.
 
-[**▶️ Watch Full Demo Video**](screenshots/demo-video.mp4)
+> 📥 **[Download Demo Video](https://github.com/SajjadKhanYousafzai/RAG-AI-Medical-Assistant-Chatbot/raw/main/screenshots/demo-video.mp4)** (43 MB)
+> 
+> *Note: GitHub cannot preview large video files. Click the link above to download and watch the full demonstration.*
 
 ### Welcome Screen - Empty Chat Interface
 The chatbot features a beautiful gradient background with an intuitive welcome screen and example prompts to get started.
