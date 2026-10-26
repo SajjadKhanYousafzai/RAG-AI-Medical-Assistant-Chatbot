@@ -1,7 +1,10 @@
-from flask import Flask,render_template,request,session,redirect,url_for
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from app.components.retriever import create_qa_chain
 from dotenv import load_dotenv
-import os
 import re
 
 load_dotenv()
@@ -67,6 +70,35 @@ def index():
 def clear():
     session.pop("messages" , None)
     return redirect(url_for("index"))
+
+
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
+    return response
+
+@app.route("/api/chat", methods=["POST", "OPTIONS"])
+def api_chat():
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+        
+    data = request.get_json(silent=True) or {}
+    user_input = data.get("prompt") or request.form.get("prompt")
+    if not user_input:
+        return jsonify({"error": "Prompt is required"}), 400
+
+    try:
+        qa_chain = create_qa_chain()
+        if qa_chain is None:
+            return jsonify({"error": "QA chain could not be created (LLM or VectorStore issue)"}), 500
+        response = qa_chain.invoke({"query": user_input})
+        result = response.get("result", "No response")
+        cleaned_result = clean_response(result)
+        return jsonify({"response": cleaned_result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__=="__main__":
     app.run(host="0.0.0.0" , port=5000 , debug=False , use_reloader = False)

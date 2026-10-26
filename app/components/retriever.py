@@ -1,4 +1,7 @@
-from langchain.chains import RetrievalQA
+try:
+    from langchain.chains import RetrievalQA
+except ImportError:
+    from langchain_classic.chains import RetrievalQA
 from langchain_core.prompts import PromptTemplate
 
 from app.components.llm import load_llm

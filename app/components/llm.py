@@ -24,13 +24,13 @@
 #         logger.error(str(error_message))
 
 from langchain_groq import ChatGroq
-from app.config.config import GROQ_API_KEY
+from app.config.config import GROQ_API_KEY, GROQ_MODEL_NAME
 from app.common.logger import get_logger
 from app.common.custom_exception import CustomException
 
 logger = get_logger(__name__)
 
-def load_llm(model_name: str = "llama-3.1-8b-instant", groq_api_key: str = GROQ_API_KEY):
+def load_llm(model_name: str = GROQ_MODEL_NAME, groq_api_key: str = GROQ_API_KEY):
     try:
         logger.info("Loading LLM from Groq using LLaMA3 model...")
 
