@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: '🩺 AI Medical Assistant | RAG Healthcare Chatbot',
+  title: 'AI Medical Assistant | RAG Healthcare Chatbot',
   description: 'Intelligent healthcare assistant powered by RAG retrieval and Groq AI.',
 };
 
